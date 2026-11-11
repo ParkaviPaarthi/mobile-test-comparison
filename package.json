@@ -1,0 +1,14 @@
+{
+  "name": "mobile-test-comparison",
+  "private": true,
+  "scripts": {
+    "compare": "node scripts/run-all.js",
+    "report": "node scripts/report.js",
+    "test:maestro": "maestro test maestro/flows",
+    "test:appium": "cd appium && npx wdio run wdio.conf.js",
+    "test:detox": "cd detox && npx detox test -c android.emu.release"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2"
+  }
+}

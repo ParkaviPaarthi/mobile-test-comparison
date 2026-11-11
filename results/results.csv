@@ -1,0 +1,10 @@
+timestamp,tool,run,passed,duration_s
+2026-11-10T18:08:20.206Z,maestro,1,true,71.3
+2026-11-10T18:09:13.131Z,maestro,2,true,52.9
+2026-11-10T18:10:05.921Z,maestro,3,true,52.8
+2026-11-10T18:10:26.483Z,appium,1,true,20.6
+2026-11-10T18:10:46.541Z,appium,2,true,20.1
+2026-11-10T18:11:06.931Z,appium,3,true,20.4
+2026-11-10T18:11:42.057Z,detox,1,true,35.1
+2026-11-10T18:12:15.207Z,detox,2,true,33.1
+2026-11-10T18:12:48.159Z,detox,3,true,33.0

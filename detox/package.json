@@ -1,0 +1,8 @@
+{
+  "name": "detox-suite",
+  "private": true,
+  "devDependencies": {
+    "detox": "^20.51.4",
+    "jest": "^29.7.0"
+  }
+}

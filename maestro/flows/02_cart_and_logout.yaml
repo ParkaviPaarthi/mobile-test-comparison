@@ -1,0 +1,13 @@
+appId: com.mobilecompare.app
+name: S2+S3 Cart and Logout
+---
+- runFlow: 01_login.yaml
+- tapOn:
+    id: "add-to-cart-button"
+- assertVisible:
+    id: "cart-badge"
+    text: "1"
+- tapOn:
+    id: "logout-button"
+- assertVisible:
+    id: "login-screen"

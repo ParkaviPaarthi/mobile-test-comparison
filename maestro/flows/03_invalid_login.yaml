@@ -1,0 +1,15 @@
+appId: com.mobilecompare.app
+name: S4 Invalid login
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: "email-input"
+- inputText: "test@example.com"
+- tapOn:
+    id: "password-input"
+- inputText: "wrong"
+- hideKeyboard
+- tapOn:
+    id: "login-button"
+- assertVisible: "Invalid credentials"
