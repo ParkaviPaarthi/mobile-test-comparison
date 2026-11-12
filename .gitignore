@@ -1,4 +1,3 @@
 node_modules/
 apps/*
 !apps/README.md
-MobileCompare/
