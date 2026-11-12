@@ -1,0 +1,119 @@
+name: E2E comparison
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: "Runs per tool"
+        default: "3"
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22   # match your local `node -v`
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install app dependencies
+        working-directory: MobileCompare
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Build release APK + Detox test APK
+        run: bash scripts/build-android.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apks
+          path: apps/*.apk
+          if-no-files-found: error
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: apks
+          path: apps
+
+      - name: Install runner dependencies
+        run: |
+          (cd appium && npm install --no-audit --no-fund && npx appium driver install uiautomator2)
+          (cd detox && npm install --no-audit --no-fund)
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run all three suites on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          RUNS: ${{ github.event.inputs.runs || '1' }}
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          avd-name: Pixel_6_API_34
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash scripts/ci-run-emulator.sh
+
+      - name: Publish results to the job summary
+        if: always()
+        run: |
+          {
+            echo "## E2E results (${RUNS:-1} run(s) per tool, GitHub-hosted runner)"
+            echo
+            echo "> CI timings are NOT comparable to local timings, and Appium's server startup is excluded. See results/RESULTS.md."
+            echo
+            echo '```'
+            node scripts/report.js || echo "no results recorded"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          RUNS: ${{ github.event.inputs.runs || '1' }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results
+          path: |
+            results/
+            detox/artifacts/
+            ~/.maestro/tests/
+          if-no-files-found: ignore
