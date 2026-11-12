@@ -68,7 +68,9 @@ jobs:
 
       - name: Install runner dependencies
         run: |
-          (cd appium && npm install --no-audit --no-fund && npx appium driver install uiautomator2)
+          (cd appium && npm install --no-audit --no-fund)
+          (cd appium && (npx appium driver list --installed 2>&1 | grep -q uiautomator2 || npx appium driver install uiautomator2))
+          (cd appium && npx appium driver list --installed)
           (cd detox && npm install --no-audit --no-fund)
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
