@@ -110,6 +110,16 @@ jobs:
         env:
           RUNS: ${{ github.event.inputs.runs || '1' }}
 
+      - name: Fail if any suite failed
+        if: always()
+        run: |
+          test -f results/results.csv || { echo "No results recorded"; exit 1; }
+          if grep -q ",false," results/results.csv; then
+            echo "At least one suite failed"
+            exit 1
+          fi
+          echo "All suites passed"
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
