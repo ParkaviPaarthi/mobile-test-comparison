@@ -21,3 +21,8 @@ curl -sf http://127.0.0.1:4723/status || echo "WARNING: Appium server did not co
 
 export APPIUM_EXTERNAL=1           # tells appium/wdio.conf.js not to start its own server
 RUNS="${RUNS:-1}" node scripts/run-all.js
+
+pkill -f "appium" || true
+pkill -f "maestro" || true
+adb -s emulator-5554 emu kill || true
+sleep 5
