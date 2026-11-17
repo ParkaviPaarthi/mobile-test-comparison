@@ -1,5 +1,7 @@
 # Mobile Test Framework Comparison: Appium vs Maestro vs Detox (React Native)
 
+[![E2E comparison](https://github.com/ParkaviPaarthi/mobile-test-comparison/actions/workflows/e2e.yml/badge.svg)](https://github.com/ParkaviPaarthi/mobile-test-comparison/actions/workflows/e2e.yml)
+
 Same app, same scenarios, three tools, same metrics.
 
 ## Prerequisites
